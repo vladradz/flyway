@@ -14,8 +14,4 @@
 -- limitations under the License.
 --
 
-alter database flyway_db_ms set single_user with rollback immediate
-GO
-
-alter database flyway_db_ms set multi_user
-GO
+INSERT INTO test_user (name) VALUES ('Mr. T');

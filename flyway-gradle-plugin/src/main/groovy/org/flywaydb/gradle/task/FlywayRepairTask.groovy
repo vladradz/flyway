@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flywaydb.gradle.task;
+package org.flywaydb.gradle.task
 
-import org.flywaydb.core.Flyway;
-import org.omg.CORBA.Object;
+import org.flywaydb.core.Flyway
 
 /**
  * Repairs the Flyway metadata table. This will perform the following actions:
@@ -25,15 +24,13 @@ import org.omg.CORBA.Object;
  *     <li>Correct wrong checksums</li>
  * </ul>
  */
-public class FlywayRepairTask extends AbstractFlywayTask {
-    public FlywayRepairTask() {
-        super();
-        setDescription("Repairs the Flyway metadata table.");
-    }
+class FlywayRepairTask extends AbstractFlywayTask {
 
-    @Override
-    protected Object run(Flyway flyway) {
-        flyway.repair();
-        return null;
-    }
+  FlywayRepairTask() {
+    description = 'Repairs the Flyway metadata table.'
+  }
+
+  def run(Flyway flyway) {
+    flyway.repair()
+  }
 }

@@ -23,6 +23,8 @@ import org.flywaydb.core.api.configuration.FlywayConfiguration;
 import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.flywaydb.core.api.resolver.MigrationResolver;
+import org.flywaydb.core.internal.batch.DefaultMigrationBatchService;
+import org.flywaydb.core.internal.batch.MigrationBatchService;
 
 /**
  * Dummy Implementation of {@link FlywayConfiguration} for unit tests.
@@ -53,40 +55,12 @@ public class FlywayConfigurationForTests implements FlywayConfiguration {
         this.migrationResolvers = myCustomMigrationResolver;
     }
 
-    public void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
-    public void setLocations(String[] locations) {
-        this.locations = locations;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-
-    public void setSqlMigrationSeparator(String sqlMigrationSeparator) {
-        this.sqlMigrationSeparator = sqlMigrationSeparator;
-    }
-
-    public void setSqlMigrationSuffix(String sqlMigrationSuffix) {
-        this.sqlMigrationSuffix = sqlMigrationSuffix;
-    }
-
-    public void setMigrationResolvers(MyCustomMigrationResolver[] migrationResolvers) {
-        this.migrationResolvers = migrationResolvers;
-    }
-
     public static FlywayConfigurationForTests create() {
         return new FlywayConfigurationForTests(Thread.currentThread().getContextClassLoader(), new String[0], "UTF-8", "V", "R", "__", ".sql");
     }
 
     public static FlywayConfigurationForTests createWithLocations(String... locations) {
         return new FlywayConfigurationForTests(Thread.currentThread().getContextClassLoader(), locations, "UTF-8", "V", "R", "__", ".sql");
-    }
-
-    public static FlywayConfigurationForTests createWithPrefix(String prefix) {
-        return new FlywayConfigurationForTests(Thread.currentThread().getContextClassLoader(), new String[0], "UTF-8", prefix, "R", "__", ".sql");
     }
 
     public static FlywayConfigurationForTests createWithPrefixAndLocations(String prefix, String... locations) {
@@ -202,38 +176,8 @@ public class FlywayConfigurationForTests implements FlywayConfiguration {
     }
 
     @Override
-    public boolean isBaselineOnMigrate() {
-        return false;
-    }
-
-    @Override
-    public boolean isOutOfOrder() {
-        return false;
-    }
-
-    @Override
-    public boolean isIgnoreFutureMigrations() {
-        return false;
-    }
-
-    @Override
-    public boolean isValidateOnMigrate() {
-        return false;
-    }
-
-    @Override
-    public boolean isCleanOnValidationError() {
-        return false;
-    }
-
-    @Override
-    public boolean isCleanDisabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isAllowMixedMigrations() {
-        return false;
+    public MigrationBatchService getMigrationBatchService() {
+        return new DefaultMigrationBatchService();
     }
 
     @Override

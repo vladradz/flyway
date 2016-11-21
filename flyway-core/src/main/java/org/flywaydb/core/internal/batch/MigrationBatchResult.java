@@ -13,11 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flywaydb.core.internal.util.scanner.classpath;
+package org.flywaydb.core.internal.batch;
 
 /**
- * Utility methods for working with Jar files.
+ * Created on 07/08/16.
+ *
+ * @author Reda.Housni-Alaoui
  */
-public class JarUtils {
-    private JarUtils() {}
+public class MigrationBatchResult {
+
+    private int numberOfAppliedMigrations;
+    private boolean done;
+
+    public int getNumberOfAppliedMigrations() {
+        return numberOfAppliedMigrations;
+    }
+
+    public void setNumberOfAppliedMigrations(int numberOfAppliedMigrations) {
+        this.numberOfAppliedMigrations = numberOfAppliedMigrations;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
 }

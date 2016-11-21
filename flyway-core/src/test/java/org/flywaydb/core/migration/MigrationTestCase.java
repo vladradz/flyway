@@ -15,6 +15,25 @@
  */
 package org.flywaydb.core.migration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -22,13 +41,13 @@ import org.flywaydb.core.api.MigrationState;
 import org.flywaydb.core.api.MigrationType;
 import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.resolver.ResolvedMigration;
+import org.flywaydb.core.internal.batch.MigrationBatchService;
 import org.flywaydb.core.internal.dbsupport.DbSupport;
 import org.flywaydb.core.internal.dbsupport.DbSupportFactory;
 import org.flywaydb.core.internal.dbsupport.FlywaySqlScriptException;
 import org.flywaydb.core.internal.dbsupport.JdbcTemplate;
 import org.flywaydb.core.internal.dbsupport.Schema;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
-import org.flywaydb.core.internal.resolver.FlywayConfigurationForTests;
 import org.flywaydb.core.internal.resolver.sql.SqlMigrationResolver;
 import org.flywaydb.core.internal.util.Location;
 import org.flywaydb.core.internal.util.PlaceholderReplacer;
@@ -39,22 +58,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import static org.junit.Assert.*;
-
 /**
  * Test to demonstrate the migration functionality.
  */
-@SuppressWarnings({"JavaDoc"})
+@SuppressWarnings({ "JavaDoc" })
 public abstract class MigrationTestCase {
     private static final Logger LOG = LoggerFactory.getLogger(MigrationTestCase.class);
 
@@ -111,19 +118,19 @@ public abstract class MigrationTestCase {
     }
 
     private void insertIntoFlyway3MetadataTable(JdbcTemplate jdbcTemplate, int versionRank, int installedRank, String version, String description, String type, String script, Integer checksum, String installedBy,
-                                                int executionTime, boolean success) throws SQLException {
+            int executionTime, boolean success) throws SQLException {
         jdbcTemplate.execute("INSERT INTO " + dbSupport.quote("schema_version")
-                        + " (" + dbSupport.quote("version_rank")
-                        + "," + dbSupport.quote("installed_rank")
-                        + "," + dbSupport.quote("version")
-                        + "," + dbSupport.quote("description")
-                        + "," + dbSupport.quote("type")
-                        + "," + dbSupport.quote("script")
-                        + "," + dbSupport.quote("checksum")
-                        + "," + dbSupport.quote("installed_by")
-                        + "," + dbSupport.quote("execution_time")
-                        + "," + dbSupport.quote("success")
-                        + ") VALUES (?,?,?,?,?,?,?,?,?,?)",
+                + " (" + dbSupport.quote("version_rank")
+                + "," + dbSupport.quote("installed_rank")
+                + "," + dbSupport.quote("version")
+                + "," + dbSupport.quote("description")
+                + "," + dbSupport.quote("type")
+                + "," + dbSupport.quote("script")
+                + "," + dbSupport.quote("checksum")
+                + "," + dbSupport.quote("installed_by")
+                + "," + dbSupport.quote("execution_time")
+                + "," + dbSupport.quote("success")
+                + ") VALUES (?,?,?,?,?,?,?,?,?,?)",
                 versionRank, installedRank, version, description, type, script, checksum, installedBy, executionTime, success);
     }
 
@@ -278,7 +285,8 @@ public abstract class MigrationTestCase {
                 dbSupport, new Scanner(Thread.currentThread().getContextClassLoader()),
                 new Location(getBasedir()),
                 PlaceholderReplacer.NO_PLACEHOLDERS,
-                FlywayConfigurationForTests.create());
+                "UTF-8",
+                "V", "R", "__", ".sql");
         List<ResolvedMigration> migrations = sqlMigrationResolver.resolveMigrations();
         for (ResolvedMigration migration : migrations) {
             if (migration.getVersion().toString().equals(migrationInfo.getVersion().toString())) {
@@ -642,6 +650,50 @@ public abstract class MigrationTestCase {
     public void schemaExists() throws SQLException {
         assertTrue(dbSupport.getOriginalSchema().exists());
         assertFalse(dbSupport.getSchema("InVaLidScHeMa").exists());
+    }
+
+    @Test
+    public void failedMigrationSingleTransaction() throws Exception {
+        flyway.setLocations("migration/failed_transactional");
+        flyway.setMigrationBatchService(new MigrationBatchService() {
+            @Override
+            public boolean isLastOfBatch(DbSupport dbSupport, MigrationInfo migrationInfo) {
+                return false;
+            }
+        });
+
+        try {
+            flyway.migrate();
+            fail();
+        } catch (FlywayException e) {
+            //Expected
+        }
+
+        if (dbSupport.supportsDdlTransactions()) {
+            assertFalse(dbSupport.getOriginalSchema().getTable("test_user").exists());
+        } else {
+            assertEquals(0, jdbcTemplate.queryForInt("select count(*) from test_user"));
+        }
+    }
+
+    @Test
+    public void failedMigrationTwoTransactions() throws Exception {
+        flyway.setLocations("migration/failed_transactional");
+        flyway.setMigrationBatchService(new MigrationBatchService() {
+            @Override
+            public boolean isLastOfBatch(DbSupport dbSupport, MigrationInfo migrationInfo) {
+                return migrationInfo.getDescription().equals("Populate table");
+            }
+        });
+
+        try {
+            flyway.migrate();
+            fail();
+        } catch (FlywayException e) {
+            //Expected
+        }
+
+        assertEquals(1, jdbcTemplate.queryForInt("select count(*) from test_user"));
     }
 
     protected void createTestTable() throws SQLException {

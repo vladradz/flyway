@@ -18,11 +18,7 @@ package org.flywaydb.core.internal.metadatatable;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationType;
 import org.flywaydb.core.api.MigrationVersion;
-import org.flywaydb.core.internal.dbsupport.DbSupport;
-import org.flywaydb.core.internal.dbsupport.JdbcTemplate;
-import org.flywaydb.core.internal.dbsupport.Schema;
-import org.flywaydb.core.internal.dbsupport.SqlScript;
-import org.flywaydb.core.internal.dbsupport.Table;
+import org.flywaydb.core.internal.dbsupport.*;
 import org.flywaydb.core.internal.util.PlaceholderReplacer;
 import org.flywaydb.core.internal.util.StringUtils;
 import org.flywaydb.core.internal.util.jdbc.RowMapper;
@@ -32,11 +28,7 @@ import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.*;
 
 /**
  * Supports reading and writing to the metadata table.
@@ -115,9 +107,9 @@ public class MetaDataTableImpl implements MetaDataTable {
     }
 
     @Override
-    public <T> T lock(Callable<T> callable) {
+    public void lock() {
         createIfNotExists();
-        return dbSupport.lock(table, callable);
+        table.lock();
     }
 
     @Override
@@ -132,7 +124,6 @@ public class MetaDataTableImpl implements MetaDataTable {
             // Try load an updateMetaDataTable.sql file if it exists
             String resourceName = "org/flywaydb/core/internal/dbsupport/" + dbSupport.getDbName() + "/updateMetaDataTable.sql";
             ClassPathResource classPathResource = new ClassPathResource(resourceName, getClass().getClassLoader());
-            int installedRank = calculateInstalledRank();
             if (classPathResource.exists()) {
                 String source = classPathResource.loadAsString("UTF-8");
                 Map<String, String> placeholders = new HashMap<String, String>();
@@ -142,7 +133,7 @@ public class MetaDataTableImpl implements MetaDataTable {
                 placeholders.put("table", table.getName());
 
                 // Placeholders for column values
-                placeholders.put("installed_rank_val", String.valueOf(installedRank));
+                placeholders.put("installed_rank_val", String.valueOf(calculateInstalledRank()));
                 placeholders.put("version_val", versionStr);
                 placeholders.put("description_val", appliedMigration.getDescription());
                 placeholders.put("type_val", appliedMigration.getType().name());
@@ -171,7 +162,7 @@ public class MetaDataTableImpl implements MetaDataTable {
                                 + "," + dbSupport.quote("success")
                                 + ")"
                                 + " VALUES (?, ?, ?, ?, ?, ?, " + dbSupport.getCurrentUserFunction() + ", ?, ?)",
-                        installedRank,
+                        calculateInstalledRank(),
                         versionStr,
                         appliedMigration.getDescription(),
                         appliedMigration.getType().name(),

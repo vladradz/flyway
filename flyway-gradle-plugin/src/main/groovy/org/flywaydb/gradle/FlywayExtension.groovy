@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flywaydb.gradle;
-
-import java.util.Map;
+package org.flywaydb.gradle
 
 /**
  * The flyway's configuration properties.
@@ -23,57 +21,45 @@ import java.util.Map;
  * <p>More info: <a href="https://flywaydb.org/documentation/gradle">https://flywaydb.org/documentation/gradle</a></p>
  */
 public class FlywayExtension {
-    /**
-     * The fully qualified classname of the jdbc driver to use to connect to the database
-     */
-    public String driver;
+    /** The fully qualified classname of the jdbc driver to use to connect to the database */
+    String driver
 
-    /**
-     * The jdbc url to use to connect to the database
-     */
-    public String url;
+    /** The jdbc url to use to connect to the database */
+    String url
 
-    /**
-     * The user to use to connect to the database
-     */
-    public String user;
+    /** The user to use to connect to the database */
+    String user
 
-    /**
-     * The password to use to connect to the database
-     */
-    public String password;
+    /** The password to use to connect to the database */
+    String password
 
-    /**
-     * The name of Flyway's metadata table
-     */
-    public String table;
+    /** The name of Flyway's metadata table */
+    String table
 
-    /**
-     * The case-sensitive list of schemas managed by Flyway
-     */
-    public String[] schemas;
+    /** The case-sensitive list of schemas managed by Flyway */
+    String[] schemas
 
     /**
      * The version to tag an existing schema with when executing baseline. (default: 1)
      */
-    public String baselineVersion;
+    String baselineVersion
 
     /**
      * The description to tag an existing schema with when executing baseline. (default: << Flyway Baseline >>)
      */
-    public String baselineDescription;
+    String baselineDescription
 
     /**
      * Locations to scan recursively for migrations. The location type is determined by its prefix.
      * (default: filesystem:src/main/resources/db/migration)
-     * <p>
+     *
      * <tt>Unprefixed locations or locations starting with classpath:</tt>
      * point to a package on the classpath and may contain both sql and java-based migrations.
-     * <p>
+     *
      * <tt>Locations starting with filesystem:</tt>
      * point to a directory on the filesystem and may only contain sql migrations.
      */
-    public String[] locations;
+    String[] locations
 
     /**
      * The fully qualified class names of the custom MigrationResolvers to be used in addition (default)
@@ -81,103 +67,85 @@ public class FlywayExtension {
      * apply.
      * <p>(default: none)</p>
      */
-    public String[] resolvers;
+    String[] resolvers
 
     /**
      * If set to true, default built-in resolvers will be skipped, only custom migration resolvers will be used.
      * <p>(default: false)</p>
      */
-    public Boolean skipDefaultResolvers;
+    Boolean skipDefaultResolvers
 
     /**
      * The file name prefix for Sql migrations
-     * <p>
+     *
      * <p>Sql migrations have the following file name structure: prefixVERSIONseparatorDESCRIPTIONsuffix ,
      * which using the defaults translates to V1_1__My_description.sql</p>
      */
-    public String sqlMigrationPrefix;
+    String sqlMigrationPrefix
 
     /**
      * The file name prefix for repeatable sql migrations (default: R).
-     * <p>
+     *
      * <p>Repeatable sql migrations have the following file name structure: prefixSeparatorDESCRIPTIONsuffix ,
      * which using the defaults translates to R__My_description.sql</p>
      */
-    public String repeatableSqlMigrationPrefix;
+    String repeatableSqlMigrationPrefix
 
     /**
      * The file name prefix for Sql migrations
-     * <p>
+     *
      * <p>Sql migrations have the following file name structure: prefixVERSIONseparatorDESCRIPTIONsuffix ,
      * which using the defaults translates to V1_1__My_description.sql</p>
      */
-    public String sqlMigrationSeparator;
+    String sqlMigrationSeparator
 
     /**
      * The file name suffix for Sql migrations
-     * <p>
+     *
      * <p>Sql migrations have the following file name structure: prefixVERSIONseparatorDESCRIPTIONsuffix ,
      * which using the defaults translates to V1_1__My_description.sql</p>
      */
-    public String sqlMigrationSuffix;
+    String sqlMigrationSuffix
 
-    /**
-     * The encoding of Sql migrations
-     */
-    public String encoding;
+    /** The encoding of Sql migrations */
+    String encoding
 
-    /**
-     * Placeholders to replace in Sql migrations
-     */
-    public Map<Object, Object> placeholders;
+    /** Placeholders to replace in Sql migrations */
+    Map<String, String> placeholders
 
-    /**
-     * Whether placeholders should be replaced.
-     */
-    public Boolean placeholderReplacement;
+    /** Whether placeholders should be replaced. */
+    Boolean placeholderReplacement
 
-    /**
-     * The prefix of every placeholder
-     */
-    public String placeholderPrefix;
+    /** The prefix of every placeholder */
+    String placeholderPrefix
 
-    /**
-     * The suffix of every placeholder
-     */
-    public String placeholderSuffix;
+    /** The suffix of every placeholder */
+    String placeholderSuffix
 
     /**
      * The target version up to which Flyway should consider migrations.
      * Migrations with a higher version number will be ignored.
      * The special value {@code current} designates the current version of the schema.
      */
-    public String target;
+    String target
 
-    /**
-     * An array of fully qualified FlywayCallback class implementations
-     */
-    public String[] callbacks;
+    /** An array of fully qualified FlywayCallback class implementations */
+    String[] callbacks
 
     /**
      * If set to true, default built-in callbacks will be skipped, only custom migration callbacks will be used.
      * <p>(default: false)</p>
      */
-    public Boolean skipDefaultCallbacks;
+    Boolean skipDefaultCallbacks
 
-    /**
-     * Allows migrations to be run "out of order"
-     */
-    public Boolean outOfOrder;
+    /** Allows migrations to be run "out of order" */
+    Boolean outOfOrder
 
-    /**
-     * Whether to automatically call validate or not when running migrate. (default: true)
-     */
-    public Boolean validateOnMigrate;
+    /** Whether to automatically call validate or not when running migrate. (default: true) */
+    Boolean validateOnMigrate
 
-    /**
-     * Whether to automatically call clean or not when a validation error occurs
-     */
-    public Boolean cleanOnValidationError;
+    /** Whether to automatically call clean or not when a validation error occurs */
+    Boolean cleanOnValidationError
 
     /**
      * Ignore future migrations when reading the metadata table. These are migrations that were performed by a
@@ -187,13 +155,13 @@ public class FlywayExtension {
      * warning is logged and Flyway continues normally. This is useful for situations where one must be able to redeploy
      * an older version of the application after the database has been migrated by a newer one. (default: {@code true})
      */
-    public Boolean ignoreFutureMigrations;
+    Boolean ignoreFutureMigrations;
 
     /**
      * Whether to disable clean. (default: {@code false})
      * <p>This is especially useful for production environments where running clean can be quite a career limiting move.</p>
      */
-    public Boolean cleanDisabled;
+    Boolean cleanDisabled;
 
     /**
      * <p>
@@ -211,5 +179,5 @@ public class FlywayExtension {
      *
      * @param baselineOnMigrate {@code true} if baseline should be called on migrate for non-empty schemas, {@code false} if not. (default: {@code false})
      */
-    public Boolean baselineOnMigrate;
+    Boolean baselineOnMigrate
 }

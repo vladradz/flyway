@@ -16,4 +16,3 @@
 
 CREATE TABLE t (qty INT, price INT);
 INSERT INTO t VALUES(3, 50);
-VACUUM t;

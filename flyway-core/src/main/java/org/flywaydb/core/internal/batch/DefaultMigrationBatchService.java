@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flywaydb.gradle.task;
+package org.flywaydb.core.internal.batch;
 
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.internal.info.MigrationInfoDumper;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.internal.dbsupport.DbSupport;
 
-public class FlywayInfoTask extends AbstractFlywayTask {
-    public FlywayInfoTask() {
-        super();
-        setDescription("Prints the details and status information about all the migrations.");
-    }
-
+/**
+ * Created on 07/08/16.
+ *
+ * @author Reda.Housni-Alaoui
+ */
+public class DefaultMigrationBatchService implements MigrationBatchService {
     @Override
-    protected Object run(Flyway flyway) {
-        System.out.println(MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
-        return null;
+    public boolean isLastOfBatch(DbSupport dbSupport, MigrationInfo migrationInfo) {
+        return true;
     }
 }

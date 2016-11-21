@@ -34,6 +34,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -286,7 +289,7 @@ public class Main {
         }
 
         for (File file : files) {
-            ClassUtils.addJarOrDirectoryToClasspath(file.getPath());
+            addJarOrDirectoryToClasspath(file.getPath());
         }
     }
 
@@ -320,8 +323,29 @@ public class Main {
             }
 
             for (File file : files) {
-                ClassUtils.addJarOrDirectoryToClasspath(file.getPath());
+                addJarOrDirectoryToClasspath(file.getPath());
             }
+        }
+    }
+
+    /**
+     * Adds a jar or a directory with this name to the classpath.
+     *
+     * @param name The name of the jar or directory to add.
+     * @throws IOException when the jar or directory could not be found.
+     */
+    /* private -> for testing */
+    static void addJarOrDirectoryToClasspath(String name) throws IOException {
+        LOG.debug("Adding location to classpath: " + name);
+
+        try {
+            URL url = new File(name).toURI().toURL();
+            URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
+            method.invoke(sysloader, url);
+        } catch (Exception e) {
+            throw new FlywayException("Unable to load " + name, e);
         }
     }
 

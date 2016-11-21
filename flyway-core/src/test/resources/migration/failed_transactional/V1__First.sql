@@ -14,10 +14,7 @@
 -- limitations under the License.
 --
 
-CREATE TABLE cities (
-    name            text,
-    population      float,
-    altitude        int     -- in feet
+CREATE TABLE test_user (
+  name VARCHAR(25) NOT NULL,
+  PRIMARY KEY(name)
 );
-
-CREATE INDEX CONCURRENTLY cities_idx ON cities(name, population, altitude);

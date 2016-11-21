@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flywaydb.core.internal.util;
+package org.flywaydb.core.internal.util.jdbc;
 
-import org.flywaydb.core.internal.util.UrlUtils;
-import org.junit.Test;
+import java.sql.SQLException;
 
-import java.io.File;
-import java.net.MalformedURLException;
-
-import static org.junit.Assert.assertEquals;
-
-public class UrlUtilsSmallTest {
-    @Test
-    public void toFilePath() throws MalformedURLException {
-        File file = new File("/test dir/a+b");
-        assertEquals(file.getAbsolutePath(), UrlUtils.toFilePath(file.toURI().toURL()));
-    }
+/**
+ * Callback for TransactionTemplate.
+ *
+ * @param <T> The type of the transaction code result.
+ */
+public interface TransactionCallback<T> {
+    /**
+     * Executes this code within a transaction.
+     *
+     * @return The result of the transaction code.
+     * @throws SQLException when the execution of a statement failed.
+     */
+    T doInTransaction() throws SQLException;
 }

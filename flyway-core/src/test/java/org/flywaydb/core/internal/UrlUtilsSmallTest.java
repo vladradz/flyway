@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flywaydb.gradle.task;
+package org.flywaydb.core.internal;
 
-import org.flywaydb.core.Flyway;
+import org.flywaydb.core.internal.util.UrlUtils;
+import org.junit.Test;
 
-public class FlywayCleanTask extends AbstractFlywayTask {
-    public FlywayCleanTask() {
-        super();
-        setDescription("Drops all objects in the configured schemas.");
-    }
+import java.io.File;
+import java.net.MalformedURLException;
 
-    @Override
-    protected Object run(Flyway flyway) {
-        flyway.clean();
-        return null;
+import static org.junit.Assert.assertEquals;
+
+public class UrlUtilsSmallTest {
+    @Test
+    public void toFilePath() throws MalformedURLException {
+        File file = new File("/test dir/a+b");
+        assertEquals(file.getAbsolutePath(), UrlUtils.toFilePath(file.toURI().toURL()));
     }
 }
